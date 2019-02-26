@@ -212,6 +212,7 @@ class equipment {
 
 		if($race=="Human"){
 			$attack_p = $attack_p += 1;
+		
 		}
 
 	}
