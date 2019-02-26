@@ -156,12 +156,16 @@ class character {
 		$this->race=$race;
 
 		if($race=="Ork"){
+			$this->life_p -= 10;
+			$this->attack_p += 2;
+			$this->defend_p += 2;
 			echo "Ork power";
 		}
 		elseif($race=="Human"){
 			echo "Human Armory";
 		}
 		elseif($race=="Elf"){
+			$this->defend_p -= 2;
 			echo 'Elf Vivacity';
 		}
 
@@ -169,6 +173,10 @@ class character {
 
 	public function set_equipment($equipment){
 		$this->equipment=$equipment;
+
+		if($this->race=="Human"){
+			$this->attack_p += 1;
+		}
 	}
 	public function get_equipment(){
 		return  $this->equipment; 
@@ -212,7 +220,7 @@ class equipment {
 
 		if($race=="Human"){
 			$attack_p = $attack_p += 1;
-		
+
 		}
 
 	}
