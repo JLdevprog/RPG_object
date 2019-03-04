@@ -149,7 +149,11 @@ Celui qui est le dernier debout est le maitre des duels.
 Organisez des escarmouches entre plusieurs personnages et monstres.
 */
 
-abstract class EtreVivant{
+
+
+//Base Character
+
+class character{
 
 	protected $name;
 	protected $life_p = 100;
@@ -158,18 +162,103 @@ abstract class EtreVivant{
 	protected $speed_p = 3;
 
 	public function __construct
-		($name, $life_p, $attack_p, $defence_p, $speed_p){
+		($name/*, $life_p, $attack_p, $defence_p, $speed_p*/){
 
 		$this->name = $name;
+		/*
 		$this->life_p = $life_p;
 		$this->attack_p = $attack_p;
 		$this->defence_p = $defence_p;
 		$this->speed_p = $speed_p;
+		*/
 
+	}
+
+	public function set_name($name){
+		$this->name=$name;
+	}
+	public function get_name(){
+		return $this->name;
+	}
+
+	public function set_life_p($life_p){
+		$this->life_p=$life_p;
+	}
+	public function get_life_p(){
+		return $this->life_p;
+	}
+
+	public function set_attack_p($attack_p){
+		$this->attack_p=$attack_p;
+	}
+	public function get_attack_p(){
+		return $this->attack_p;
+	}
+
+	public function set_defend_p($defend_p){
+		$this->defend_p=$defend_p;
+	}
+	public function get_defend_p(){
+		return $this->defend_p;
+	}
+
+	public function set_speed_p($speed_p){
+		$this->speed_p=$speed_p;
+	}
+	public function get_speed_p(){
+		return $this->speed_p;
 	}
 
 	//
 
 }
+
+class action{
+
+	protected $action;
+
+	public function __construct($action){
+		$this->action=$action;
+	}
+
+}
+
+class attack {
+
+	protected $attack="Attack?!";
+
+	public function set_attack($attack){
+		$this->attack=$attack;
+	}
+	public function get_attack(){
+		return $this->attack;
+	}
+}
+
+class defend extends action{
+
+	protected $attack;
+
+	public function __construct($defend){
+		$this->defend=$defend;
+	}
+}
+
+class power extends action{
+
+	protected $attack;
+
+	public function __construct($power){
+		$this->power=$power;
+	}
+}
+
+
+
+$test = new character("JL"/*,"", "", "", ""*/);
+
+?><pre><?php
+var_dump($test);
+?><pre><?php
 
 ?>
