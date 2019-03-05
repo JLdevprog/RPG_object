@@ -1,70 +1,141 @@
-<?php
+<?php 
 
-class character{
+//First Part Character & Action
 
-	private $_force = 50;
-	private $_local = "VW";
-	private $_xp = 1;
-	private $_dam =0;
-
-	public function move(){
+class Character{
+	//Character details
+	private $_id,
+			$_dam,
+			$_name;
+	//Hydrate my data
+	public function hydrate(array $data){
+		foreach($data as $key => $value){
+			$method = 'set'.ucfirst($key);
+			if(method_exists($this, $method)){
+				$this->$method($value);
+			}
+		}
+	}
+	//Construct data
+	public function __construct(array $data){
+		$this->hydrate($data);
 	}
 
-	public function tap(character $persoTarget){
-		$persoTarget->_dam += $this->_force;
+	const ITS_ME = 1;
+	CONST PERSO_DIE =2;
+	const PERSO_TAP =3;
+
+	public function tap(Character $perso){
+		if($perso->id() == $this->_id){
+			return self::ITS_ME;
+		}
+		//if Inform is trying...
+		//Inform the Perso to receive it
 	}
 
-	public function lv_up(){
+	public function receivDam(){
+		$this->_dam += 5;
+		if($this->_dam >= 100){
+			return self::PERSO_DIE;
+		}
+		return self::PERSO_TAP;
 	}
-
-	public function talk(){
-		echo "I talk...";
-	}
-
-	public function get_force(){
-		return $this->_force;
-	}
-
-	public function get_dam(){
+	//Getters
+	public function dam(){
 		return $this->_dam;
 	}
 
-	public function get_xp(){
-		return $this->_xp;
+	public function id(){
+		return $this->_id;
 	}
-	public function win_xp(){
-		$this->_xp++;
+
+	public function name(){
+		return $this->_name;
 	}
-	
+
+	public function setDam($dam){
+		$dam = (int) $dam;
+		if($dam>=0 && $dam <=100){
+			$this->_dam = $dam;
+		}
+	}
+
+	public function setId($id){
+		$id = (int) $id;
+		if($id>0){
+			$this->_id = $id;
+		}
+	}
+
+	public function setName($name){
+		if(is_string($name)){
+			$this->_name = $name;
+		}
+	}
+
 }
 
-$perso = new character;
+//Second Part DataBase Manager
 
-$perso2 = new character;
+class PersoManager{
+	private $_db; // PDO Instance
 
-$perso->talk();
+	public function __construct($db){
+		$this->setDb($db);
+	}
 
-echo "<br>";
+	public function add(Character $perso){
+		//Prepar Insert Request
+		$q = $this->_db->
+			prepare('INSERT INTO character(name) VALUES(:name)');
+		//Assign Valor for Name
+		$q->bindValue(':name', $perso->name());
+		//Execute Request
+		$q->execute();
 
-$perso->get_xp();
-echo "<br>";
-$perso->win_xp();
-$perso->get_xp();
-echo "<br>";
+		//Hydrate Character with parameter require
+		$perso->hydrate([
+			'id' => $this->_db->lastInsertId(),
+			'dam' => 0,
+		]);
+	}
 
-$perso->tap($perso2);
-$perso->win_xp();
+	public function count(){
+		//Execute COUNT() request for result
+	}
 
-?><pre><?php
-var_dump($perso);
-var_dump($perso2);
-?><pre><?php
+	public function delete(Character $perso){
+		//Execute DELETE Request ...
+	}
 
-$perso->setForce(10);
-$perso->setXP(5);
+	public function exists($info){
+		//if int number, its an identifiant
+		//Execute COUNT() Request with WHERE case to return Boolean
 
-echo "First Perso : <br> ";
-echo "Force ",$perso->_force(),"<br>";
-echo "Damage ",$perso->_dam(),"<br>";
-echo "Experience ",$perso->_xp(),"<br>";
+		//if type Name
+		//Execute COUNT() with WHERE & return Boolean
+	}
 
+	public function get($info){
+		//if int number, We want get the Perso
+		//Execute SELECT() Request with WHERE case to return OP Perso
+
+		//if type Name
+		//Execute SELECT() with WHERE & return Perso
+	}
+
+	public function getList($name){
+		//Return Perso List from other than him
+		//Result in Instance table
+	}
+
+	public function update(Character $perso){
+		//Prepare UPDATE Request
+		//Assign Valor to Request
+		//Execute Request
+	}
+
+	public function setDb(PDO $db){
+		$this->_db = $db;
+	}
+}
