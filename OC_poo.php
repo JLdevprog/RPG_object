@@ -158,7 +158,7 @@ class PersoManager{
 		$q->execute([':name'=>$name]);
 
 		while($data = $q->fetch(PDO::FETCH_ASSOC)){
-			$persos[] = new character($data);
+			$persos[] = new Character($data);
 		}
 		//Result in Instance table
 		return $persos;
@@ -179,28 +179,7 @@ class PersoManager{
 	}
 }
 
-?>
-
-<!DOCTYPE html>
-
-<html>
-	<head>
-		<title>Virtual Fight Mini-Game</title>
-		<meta charset="utf-8" />
-	</head>
-
-	<body>
-		<form action="" method='post'>
-			<p>
-				Name: <input type="text" name="name" maxlength="50" />
-				<input type="submit" value="Create Perso" name="Create" />
-				<input type="submit" value="Use the Perso" name="Use" />
-			</p>
-		</form>
-	</body>
-</html>
-
-<?php
+//Other Part
 
 function chargeClass($classname){
 	require $classname.'.php';
@@ -210,7 +189,7 @@ spl_autoload_register('chargeClass');
 
 session_start();//Call Session after AutoLoad
 
-if(isset($_GET['disconect'])){
+if(isset($_GET['disconnect'])){
 	session_destroy();
 	header('location: .');
 	exit();
@@ -219,18 +198,22 @@ if(isset($_GET['disconect'])){
 $db = new PDO('mysql:host=localhost;dbname=rpg_op','root', '');
 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);//in case of Rquest Issue
 
-$Manager = new PersoManager($db);
+$manager = new PersoManager($db);
+
+if(isset($_SESSION['perso'])){
+	$perso = $_SESSION['perso'];
+}
 
 if(isset($_POST['Create']) && isset($_POST['name'])){
 	//Create New
-	$perso = new character(['name' => $_POST['name']]);
+	$perso = new Character(['name' => $_POST['name']]);
 
 	if(!$perso->validName()){
 		$message = "The Name is not Valid.";
 		unset($perso);
 	}
 	elseif($manager->exists($perso->name())){
-		$message = 'The Character Name is already use.';
+		$message = "The Character Name is already use.";
 		unset($perso);
 	}
 	else{
@@ -245,4 +228,110 @@ elseif(isset($_POST['Use']) && isset($_POST['name'])){
 	else{
 		$message = "This Perso does not Exist.";
 	}
+}
+
+elseif(isset($_GET['tap'])){
+	if(!isset($perso)){
+		$message = "Create ou Identify the Perso to use.";
+	}
+	else{
+		if(!$manager->exists((int) $_GET['tap'])){
+			$message = "The Perso you Tap do not exist.";
+		}
+		else{
+			$persoToTap = $manager->get((int) $_GET['tap']);
+
+			$return = $perso->tap($persoToTap);
+
+			switch ($return){
+				case Character::ITS_ME : 
+					$message = "You can not Tap YourSelf.";
+					break;
+				case Character::PERSO_TAP : 
+					$message = "The Perso get your Tap.";
+
+					$manager->update($perso);
+					$manager->update($persoToTap);
+
+					break;
+
+				case Character::PERSO_DIE : 
+				$message = "You killed the Perso";
+
+				$manager->update($perso);
+				$manager->delete($persoToTap);
+
+				break;
+			}
+		}
+	}
+}
+
+?>
+
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<title>Virtual Fight Mini-Game</title>
+		<meta charset="utf-8" />
+	</head>
+
+	<body>
+
+		<p>Number of Perso Create : <?= $manager->count() ?></p>
+		<?php
+			if(isset($message)){
+				echo "<p>", $message, "</p>";
+			}
+			if(isset($perso)){
+				?>
+				<p><a href="?disconnect=1">Disconnect</a></p>
+
+				<fieldset>
+					<legend>My Details</legend>
+					<p>
+						Name : <? htmlspecialchars($perso->name()) ?><br />
+						Damage : <?= $perso->dam() ?>
+					</p>
+				</fieldset>
+
+				<fieldset>
+					<legend>Who to Tap?</legend>
+					<p>
+						<?php
+						$persos = $manager->getList($perso->name());
+
+						if(empty($persos)){
+							echo "Nobody to Tap.";
+						}
+						else{
+							foreach($perso as $aPerso){
+								echo '<a href="?tap=', $aPerso->id(), '">',htmlspecialchars($aPerso->name()), '</a> (damage : ',$aPerso->dam(), ')<br />';
+							}
+						}
+						?>
+					</p>
+				</fieldset>
+				<?php
+			}
+			else{
+				?>
+
+					<form action="" method='post'>
+						<p>
+							Name: <input type="text" name="name" maxlength="50" />
+							<input type="submit" value="Create Perso" name="Create" />
+							<input type="submit" value="Use the Perso" name="Use" />
+						</p>
+					</form>
+			<?php
+			}
+			?>
+	</body>
+</html>
+
+<?php
+if(isset($perso)){
+	$_SESSION['perso'] = $perso;
 }
