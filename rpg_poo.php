@@ -150,30 +150,31 @@ Organisez des escarmouches entre plusieurs personnages et monstres.
 */
 
 
-
 //Base Character
 
 class character{
 
 	protected $name;
-	protected $life_p = 100;
-	protected $attack_p = 10;
-	protected $defence_p = 5;
-	protected $speed_p = 3;
+	protected $breed;
+	protected $life_p=100;
+	protected $attack_p=10;
+	protected $defence_p=5;
+	protected $speed_p=3;
+	//protected $equipment;
+	protected $slot1;
+	protected $slot2;
+	protected $slot3;
+	protected $slot4;
+	protected $action="pending";
 
 	public function __construct
-		($name/*, $life_p, $attack_p, $defence_p, $speed_p*/){
+		($name, $breed="human"){
 
 		$this->name = $name;
-		/*
-		$this->life_p = $life_p;
-		$this->attack_p = $attack_p;
-		$this->defence_p = $defence_p;
-		$this->speed_p = $speed_p;
-		*/
-
+		$this->breed = $breed;
 	}
 
+	//Base Points:
 	public function set_name($name){
 		$this->name=$name;
 	}
@@ -181,8 +182,16 @@ class character{
 		return $this->name;
 	}
 
+	public function set_breed($breed){
+		$this->breed=$breed;
+	}
+	public function get_breed(){
+		return $this->breed;
+	}
+
 	public function set_life_p($life_p){
 		$this->life_p=$life_p;
+		//$equipment->set_life_p($this->life_p);
 	}
 	public function get_life_p(){
 		return $this->life_p;
@@ -190,16 +199,19 @@ class character{
 
 	public function set_attack_p($attack_p){
 		$this->attack_p=$attack_p;
+		/*if($this->breed=="human"){
+		$this->attack_p+=5;
+		}*/
 	}
 	public function get_attack_p(){
 		return $this->attack_p;
 	}
 
-	public function set_defend_p($defend_p){
-		$this->defend_p=$defend_p;
+	public function set_defence_p($defence_p){
+		$this->defence_p=$defence_p;
 	}
 	public function get_defend_p(){
-		return $this->defend_p;
+		return $this->defence_p;
 	}
 
 	public function set_speed_p($speed_p){
@@ -209,56 +221,103 @@ class character{
 		return $this->speed_p;
 	}
 
-	//
+	//Eqipments
+	/*public function set_equipment($equipment){
+		$this->equipment=$equipment;
+	}
+	public function get_eqipment(){
+		return $this->equipment;
+	}*/
+	//Slot System
+	public function set_slot1($equipment){
+		$this->slot1=$equipment;
+	}
+	public function getslot1(){
+		return $this->slot1;
+	}
+	public function set_slot2($equipment){
+		$this->slot2=$equipment;
+	}
+	public function getslot2(){
+		return $this->slot2;
+	}
+	public function set_slot3($equipment){
+		$this->slot3=$equipment;
+	}
+	public function getslot3(){
+		return $this->slot3;
+	}
+	public function set_slot4($equipment){
+		$this->slot4=$equipment;
+	}
+	public function getslot4(){
+		return $this->slot4;
+	}
 
-}
-
-class action{
-
-	protected $action;
-
-	public function __construct($action){
+	//Action
+	public function set_action($action){
 		$this->action=$action;
 	}
+	public function get_action(){
+		return $this->action;
+	}
 
 }
 
-class attack {
+//Equipment
+class equipment{
+	protected $name;
+	protected $type;
+	protected $life_p;
+	protected $attack_p;
+	protected $defence_p;
+	protected $speed_p;
 
-	protected $attack="Attack?!";
-
-	public function set_attack($attack){
-		$this->attack=$attack;
-	}
-	public function get_attack(){
-		return $this->attack;
-	}
-}
-
-class defend extends action{
-
-	protected $attack;
-
-	public function __construct($defend){
-		$this->defend=$defend;
+	public function __construct($name, $type, $life_p, $attack_p, $defence_p, $speed_p){
+		$this->name=$name;
+		$this->type=$type;
+		$this->life_p=$life_p;
+		$this->attack_p=$attack_p;
+		$this->defence_p=$defence_p;
+		$this->speed_p=$speed_p;
 	}
 }
 
-class power extends action{
+//Test OP:
 
-	protected $attack;
-
-	public function __construct($power){
-		$this->power=$power;
-	}
-}
-
-
-
-$test = new character("JL"/*,"", "", "", ""*/);
+$John = new character("John");
 
 ?><pre><?php
-var_dump($test);
+var_dump($John);
+?><pre><hr><?php
+
+//$attack = "Attack?!";
+
+$John->set_action("Attack");
+//echo $John->get_action();
+
 ?><pre><?php
+var_dump($John);
+?><pre><hr><?php
+
+$sword = new equipment("Epic Sword","sword", 5, 10, 2, 1);
+
+$John->set_slot1($sword);
+
+?><pre><?php
+var_dump($sword);
+echo "<hr>";
+var_dump($John);
+?><pre><hr><?php
+
+$shield = new equipment("Epic Shield","shield", 0, 1, 8, -1);
+
+$John->set_slot2($shield);
+
+?><pre><?php
+var_dump($shield);
+echo "<hr>";
+var_dump($John);
+?><pre><hr><?php
 
 ?>
